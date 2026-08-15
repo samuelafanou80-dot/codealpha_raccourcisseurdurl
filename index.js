@@ -57,3 +57,28 @@ app.post('/api/shorten', (req, res) => {
     });
   });
 });
+
+app.get('/:code', (req, res) => {
+  const shortCode = req.params.code;
+
+  const query = `SELECT original_url FROM urls WHERE short_code = ?`;
+  
+  db.get(query, [shortCode], (err, row) => {
+    if (err) {
+      console.error('Erreur lors de la recherche de l\'URL :', err);
+      return res.status(500).json({ error: 'Erreur serveur lors de la redirection.' });
+    }
+
+    if (row) {
+      // Redirection HTTP 302 temporaire vers l'URL d'origine nettoyée
+      return res.redirect(302, row.original_url);
+    } else {
+      return res.status(404).json({ error: 'URL raccourcie non trouvée ou expirée.' });
+    }
+  });
+});
+
+// Démarrage du serveur
+app.listen(PORT, () => {
+  console.log(`Serveur prêt sur http://localhost:${PORT}`);
+});
