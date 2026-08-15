@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Raccourcisseur d'URL</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 500px; margin: 50px auto; padding: 20px; }
+    input { width: 100%; padding: 10px; margin-bottom: 10px; box-sizing: border-box; }
+    button { width: 100%; padding: 10px; background-color: #007bff; color: white; border: none; cursor: pointer; }
+    #result { margin-top: 20px; word-break: break-all; }
+  </style>
+</head>
+<body>
+  <h2>Raccourcisseur d'URL Simple</h2>
+  <form id="urlForm">
+    <input type="url" id="longUrl" placeholder="Entrez votre URL longue (ex: https://example.com)" required>
+    <button type="submit">Raccourcir</button>
+  </form>
+
+  <div id="result"></div>
+
+  <script>
+    document.getElementById('urlForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const longUrl = document.getElementById('longUrl').value;
+
+      const response = await fetch('/api/shorten', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ originalUrl: longUrl })
+      });
+
+      const data = await response.json();
+      const resultDiv = document.getElementById('result');
+
+      if (response.ok) {
+        resultDiv.innerHTML = `<p>URL courte : <a href="${data.shortUrl}" target="_blank">${data.shortUrl}</a></p>`;
+      } else {
+        resultDiv.innerHTML = `<p style="color:red;">Erreur : ${data.error}</p>`;
+      }
+    });
+  </script>
+</body>
+</html>
